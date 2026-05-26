@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Teste EmailJS</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #0A0F1C; color: #E5E7EB; }
+        .container { max-width: 600px; margin: 0 auto; background: #1a1f2e; padding: 20px; border-radius: 8px; }
+        input, textarea, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #7C3AED; border-radius: 5px; background: #222c44; color: #E5E7EB; }
+        button { background: #7C3AED; cursor: pointer; }
+        button:hover { background: #6D28D9; }
+        #resultado { margin-top: 20px; padding: 15px; background: #222c44; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste EmailJS</h1>
+        <input type="text" id="nome" placeholder="Nome">
+        <input type="text" id="assunto" placeholder="Assunto">
+        <textarea id="msg" placeholder="Mensagem" rows="5"></textarea>
+        <button onclick="testar()">Enviar Teste</button>
+        <div id="resultado"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3.11.0/dist/build/email.min.js"></script>
+    <script>
+        const SERVICE_ID = 'service_phvrtak';
+        const TEMPLATE_ID = 'template_fnvxmsx';
+        const PUBLIC_KEY = 'qIt2GEhCJGQ4Nl8rF';
+
+        window.addEventListener('load', () => {
+            emailjs.init(PUBLIC_KEY);
+            console.log('✅ EmailJS iniciado');
+        });
+
+        async function testar() {
+            const nome = document.getElementById('nome').value;
+            const assunto = document.getElementById('assunto').value;
+            const msg = document.getElementById('msg').value;
+            const resultado = document.getElementById('resultado');
+
+            if (!nome || !assunto || !msg) {
+                resultado.innerHTML = '⚠️ Preencha todos os campos';
+                return;
+            }
+
+            resultado.innerHTML = '⏳ Enviando...';
+
+            try {
+                console.log('📧 Enviando com estas variáveis:');
+                const params = {
+                    name: nome,
+                    from_name: nome,
+                    from_email: 'teste@portfolio.com',
+                    email: 'teste@portfolio.com',
+                    title: assunto,
+                    subject: assunto,
+                    message: msg
+                };
+                console.log(JSON.stringify(params, null, 2));
+
+                const resp = await emailjs.send(SERVICE_ID, TEMPLATE_ID, params);
+                console.log('✅ Resposta:', resp);
+
+                resultado.innerHTML = `
+                    <h3 style="color: #10b981;">✅ Enviado com sucesso!</h3>
+                    <p>Status: ${resp.status}</p>
+                    <p>Verifique o console (F12) para detalhes</p>
+                `;
+            } catch (erro) {
+                console.error('❌ Erro completo:', erro);
+                resultado.innerHTML = `
+                    <h3 style="color: #ef4444;">❌ Erro:</h3>
+                    <p><strong>Mensagem:</strong> ${erro.message}</p>
+                    <p><strong>Status:</strong> ${erro.status}</p>
+                    <p><strong>Veja o console (F12) para mais detalhes</strong></p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
