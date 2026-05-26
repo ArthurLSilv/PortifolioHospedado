@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Diagnóstico EmailJS</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0A0F1C;
+            color: #E5E7EB;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1f2e;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .test {
+            margin: 15px 0;
+            padding: 15px;
+            background: #222c44;
+            border-radius: 5px;
+            border-left: 4px solid #7C3AED;
+        }
+        .pass { border-left-color: #10b981; }
+        .fail { border-left-color: #ef4444; }
+        code {
+            background: #0A0F1C;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: block;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        button {
+            background: #7C3AED;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #6D28D9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnóstico EmailJS</h1>
+
+        <div class="test" id="test1">
+            <strong>1. EmailJS Carregado?</strong>
+            <p>Verificando se a biblioteca EmailJS foi carregada...</p>
+        </div>
+
+        <div class="test" id="test2">
+            <strong>2. Credenciais Verificadas?</strong>
+            <p>Verificando as chaves de configuração...</p>
+        </div>
+
+        <div class="test" id="test3">
+            <strong>3. EmailJS Inicializado?</strong>
+            <p>Verificando se EmailJS foi inicializado corretamente...</p>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #222c44; border-radius: 5px;">
+            <h3>Teste de Envio</h3>
+            <p>Clique no botão abaixo para testar o envio de um email:</p>
+            <button onclick="testarEnvio()">📧 Enviar Email de Teste</button>
+            <div id="resultado"></div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #222c44; border-radius: 5px;">
+            <h3>Informações do Console</h3>
+            <p>Abra o Console (F12) e veja as mensagens de log para mais detalhes.</p>
+            <code id="console-output">Abra o console do navegador (F12) para ver logs...</code>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/build/email.min.js"></script>
+
+    <script>
+        const EMAILJS_KEY = 'qIt2GEhCJGQ4Nl8rF';
+        const EMAILJS_SERVICE = 'service_phvrtak';
+        const EMAILJS_TEMPLATE = 'template_fnvxmsx';
+
+        console.log('=== DIAGNÓSTICO EMAILJS ===');
+        console.log('URL:', window.location.href);
+        console.log('Timestamp:', new Date().toISOString());
+
+        // Teste 1: EmailJS carregado
+        setTimeout(() => {
+            const test1 = document.getElementById('test1');
+            if (typeof emailjs !== 'undefined') {
+                test1.classList.add('pass');
+                test1.innerHTML += '<p>✅ EmailJS carregado com sucesso</p>';
+                console.log('✅ EmailJS disponível');
+
+                // Teste 2: Credenciais
+                const test2 = document.getElementById('test2');
+                test2.classList.add('pass');
+                test2.innerHTML += `<p>✅ Credenciais configuradas</p>
+                <code>Public Key: ${EMAILJS_KEY}</code>
+                <code>Service ID: ${EMAILJS_SERVICE}</code>
+                <code>Template ID: ${EMAILJS_TEMPLATE}</code>`;
+                console.log('✅ Credenciais OK');
+
+                // Teste 3: Inicializar
+                try {
+                    emailjs.init(EMAILJS_KEY);
+                    const test3 = document.getElementById('test3');
+                    test3.classList.add('pass');
+                    test3.innerHTML += '<p>✅ EmailJS inicializado com sucesso</p>';
+                    console.log('✅ EmailJS inicializado');
+                } catch (e) {
+                    const test3 = document.getElementById('test3');
+                    test3.classList.add('fail');
+                    test3.innerHTML += `<p>❌ Erro ao inicializar: ${e.message}</p>`;
+                    console.error('❌ Erro ao inicializar:', e);
+                }
+            } else {
+                test1.classList.add('fail');
+                test1.innerHTML += '<p>❌ EmailJS NÃO carregou</p>';
+                console.error('❌ EmailJS não disponível');
+            }
+        }, 1000);
+
+        async function testarEnvio() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<p>⏳ Enviando...</p>';
+
+            try {
+                console.log('📧 Iniciando teste de envio...');
+
+                if (typeof emailjs === 'undefined') {
+                    throw new Error('EmailJS não carregou');
+                }
+
+                const resp = await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+                    name: 'Teste de Diagnóstico',
+                    from_name: 'Teste de Diagnóstico',
+                    from_email: 'teste@diagnostico.com',
+                    subject: 'Teste de EmailJS - ' + new Date().toLocaleString(),
+                    message: 'Este é um email de teste do diagnóstico.\n\nSe você recebeu este email, o EmailJS está funcionando corretamente!'
+                });
+
+                console.log('✅ Email enviado:', resp);
+                resultado.innerHTML = `
+                    <p style="color: #10b981;">✅ Email enviado com sucesso!</p>
+                    <p>Status: ${resp.status}</p>
+                    <p>Verifique seu email em: engs-arthursilva@camporeal.edu.br</p>
+                `;
+            } catch (erro) {
+                console.error('❌ Erro ao enviar:', erro);
+                resultado.innerHTML = `
+                    <p style="color: #ef4444;">❌ Erro ao enviar:</p>
+                    <code>${erro.message}</code>
+                    <p>Verifique o console (F12) para mais detalhes.</p>
+                `;
+            }
+        }
+
+        // Log tudo no console
+        console.log('Testes iniciados...');
+    </script>
+</body>
+</html>
