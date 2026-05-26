@@ -58,14 +58,39 @@ nav a:hover {
 #botaoContato {
     background-color: #7C3AED;
     color: #E5E7EB;
-    padding: 0.75rem;           
-    border-radius: 0.5rem;     
-    animation: all 0.5s ease;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 #botaoContato:hover {
     background-color: #6D28D9;
     transform: scale(1.05);
+}
+
+#botaoEnviar {
+    background-color: #7C3AED;
+    color: #E5E7EB;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    font-size: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+#botaoEnviar:hover:not(:disabled) {
+    background-color: #6D28D9;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(124, 58, 237, 0.4);
+}
+
+#botaoEnviar:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 main {
@@ -362,30 +387,54 @@ i {
 input {
     color: #babcbe;
     background-color: #222c4456;
-    padding: 0.75rem;         
-    border-radius: 0.5rem;     
+    padding: 0.75rem;
+    border-radius: 0.5rem;
     width: 100%;
     border: 1px solid #3a4a6b;
     outline: none;
     box-sizing: border-box;
     font-family: inherit;
     font-size: inherit;
+    transition: all 0.3s ease;
 }
 
-#suamsg {
+input:focus {
+    border-color: #7C3AED;
+    background-color: #2d3a5e;
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+    color: #E5E7EB;
+}
+
+input::placeholder {
+    color: #6b7280;
+}
+
+#mensagem {
     color: #babcbe;
     background-color: #222c4456;
-    padding: 0.75rem;      
-    border-radius: 0.5rem;    
+    padding: 0.75rem;
+    border-radius: 0.5rem;
     width: 100%;
     border: 1px solid #3a4a6b;
     outline: none;
     box-sizing: border-box;
     font-family: inherit;
     font-size: inherit;
-    height: 6.25rem;           
-    resize: vertical;
+    height: 8rem;
+    resize: none;
     vertical-align: top;
+    transition: all 0.3s ease;
+}
+
+#mensagem:focus {
+    border-color: #7C3AED;
+    background-color: #2d3a5e;
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+    color: #E5E7EB;
+}
+
+#mensagem::placeholder {
+    color: #6b7280;
 }
 
 #Sobre, #Portifolio, #Servicos, #Provasocial, #Contato {

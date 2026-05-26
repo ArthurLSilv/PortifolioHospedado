@@ -11,7 +11,7 @@
     <header>
         <div class="blocosHeader">
             <h4>
-                Arthur       
+                Arthur
             </h4>
             <h4 class="destaque">
                 Silva
@@ -44,8 +44,8 @@
                 <button id="botaoContato"><a href="#Contato">Entre em Contato</a></button>
             </div>
             <div class="blocosMainDireitaInicio">
-                <img id="foto" src="assets/foto.png" alt="Foto de Arthur Silva de camisa verde com as maos no bolso de relogio no pulso">        
-            </div> 
+                <img id="foto" src="assets/foto.png" alt="Foto de Arthur Silva de camisa verde com as maos no bolso de relogio no pulso">
+            </div>
         </div>
 
 
@@ -57,15 +57,15 @@
 
                     <p id="Sobre">SOBRE MIM</p>
                     <h2>Minha história com a programação</h2>
-                    
+
                     <p class="pSobremim">Sou estudante de Engenharia de Software e também curso formação no Instituto 3C, onde venho desenvolvendo minhas habilidades na área de tecnologia.</p>
-                    
+
                     <p class="pSobremim">Tenho foco em desenvolvimento front-end, criando interfaces modernas e funcionais com HTML, CSS e JavaScript, e estou sempre em busca de evolução para me tornar um desenvolvedor cada vez mais completo.</p>
 
                 <button id="botaoContato">
                     <a href="assets/curriculo.pdf" download="Curriculo Arthur Silva.pdf">Baixar Currículo</a>
                 </button>
-            </div> 
+            </div>
         </div>
 
         <div class="containerPortifolio">
@@ -126,7 +126,7 @@
         <div class="containerPortifolio">
             <p id="Servicos">SERVIÇOS & SKILLS</p>
             <h2>Como posso ajudar</h2>
-            
+
             <div class="blocosProjetos">
                 <div class="cards">
                     <i class="fa-solid fa-object-group"></i>
@@ -247,7 +247,7 @@
 
         <div class="containerPortifolio">
             <p id="Contato">CONTATO</p>
-            
+
             <div class="ladoalado">
                 <div class="contatoEsquerda">
                     <h2>Vamos trabalhar juntos?</h2>
@@ -271,18 +271,113 @@
                 </div>
 
                 <div class="contatoDireita">
-                    <div class="ladoalado">
-                        <input type="text" placeholder="Nome">
-                        <input type="text" placeholder="E-mail">
-                    </div>
-                    <input type="text" placeholder="Assunto">
-                    <textarea id="suamsg" placeholder="Sua mensagem"></textarea>                 
-                    <button id="botaoContato">Enviar Mensagem</button>
+                    <input type="text" id="nome" placeholder="Nome">
+                    <input type="text" id="assunto" placeholder="Assunto">
+                    <textarea id="mensagem" placeholder="Sua mensagem"></textarea>
+                    <button id="botaoEnviar">Enviar Mensagem</button>
 
                 </div>
             </div>
         </div>
 
     </main>
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/build/email.min.js"></script>
+
+    <script>
+        const EMAILJS_KEY = 'qIt2GEhCJGQ4Nl8rF';
+        const EMAILJS_SERVICE = 'service_phvrtak';
+        const EMAILJS_TEMPLATE = 'template_fnvxmsx';
+
+        setTimeout(() => {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(EMAILJS_KEY);
+                console.log('✅ EmailJS inicializado');
+            }
+        }, 500);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ Página iniciada');
+
+            // Scroll suave
+            document.querySelectorAll('a[href^="#"]').forEach(a => {
+                a.addEventListener('click', e => {
+                    const href = a.getAttribute('href');
+                    if (href !== '#') {
+                        const el = document.querySelector(href);
+                        if (el) {
+                            e.preventDefault();
+                            el.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            });
+            console.log('✅ Scroll suave ativo');
+
+            // Animações
+            const css = document.createElement('style');
+            css.textContent = `@keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } } .fade-in { animation: fadeInUp 0.8s ease forwards; }`;
+            document.head.appendChild(css);
+
+            const obs = new IntersectionObserver(e => {
+                e.forEach(x => {
+                    if (x.isIntersecting) x.target.classList.add('fade-in');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.bloco, .cards, .cardsProva').forEach(el => obs.observe(el));
+            console.log('✅ Animações ativas');
+
+            // Formulário
+            const btn = document.getElementById('botaoEnviar');
+            const nome = document.getElementById('nome');
+            const assunto = document.getElementById('assunto');
+            const msg = document.getElementById('mensagem');
+
+            btn.addEventListener('click', async e => {
+                e.preventDefault();
+
+                const n = nome.value.trim();
+                const a = assunto.value.trim();
+                const m = msg.value.trim();
+
+                if (!n || !a || !m) {
+                    alert('⚠️ Preencha todos os campos!');
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.textContent = 'Enviando...';
+
+                try {
+                    if (typeof emailjs === 'undefined') {
+                        throw new Error('EmailJS não carregou');
+                    }
+
+                    await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+                        name: n,
+                        from_name: n,
+                        from_email: 'contato@portfolio.com',
+                        subject: a,
+                        message: m
+                    });
+
+                    alert('✅ Mensagem enviada com sucesso!');
+                    nome.value = '';
+                    assunto.value = '';
+                    msg.value = '';
+                } catch (erro) {
+                    alert('❌ Erro: ' + erro.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Enviar Mensagem';
+                }
+            });
+
+            console.log('✅ Tudo ativo!');
+        });
+    </script>
+
 </body>
 </html>
