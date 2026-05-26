@@ -282,42 +282,7 @@
 
     </main>
 
-    <!-- EmailJS - Carregar dinamicamente -->
     <script>
-        const EMAILJS_KEY = 'qIt2GEhCJGQ4Nl8rF';
-        const EMAILJS_SERVICE = 'service_phvrtak';
-        const EMAILJS_TEMPLATE = 'template_fnvxmsx';
-
-        // Carregar EmailJS de forma assíncrona
-        function loadEmailJS() {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3.11.0/dist/build/email.min.js';
-                script.async = true;
-                script.onload = () => {
-                    console.log('✅ Script EmailJS carregado');
-                    try {
-                        emailjs.init(EMAILJS_KEY);
-                        console.log('✅ EmailJS inicializado');
-                        resolve(true);
-                    } catch (e) {
-                        console.error('❌ Erro ao inicializar:', e);
-                        reject(e);
-                    }
-                };
-                script.onerror = () => {
-                    console.error('❌ Erro ao carregar script EmailJS');
-                    reject(new Error('Falha ao carregar EmailJS'));
-                };
-                document.head.appendChild(script);
-            });
-        }
-
-        // Tentar carregar quando a página inicia
-        loadEmailJS().catch(e => {
-            console.error('⚠️ EmailJS não carregou:', e);
-        });
-
         document.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Página iniciada');
 
@@ -350,7 +315,7 @@
             document.querySelectorAll('.bloco, .cards, .cardsProva').forEach(el => obs.observe(el));
             console.log('✅ Animações ativas');
 
-            // Formulário - EmailJS
+            // Formulário - Netlify Function
             const btn = document.getElementById('botaoEnviar');
             const nome = document.getElementById('nome');
             const assunto = document.getElementById('assunto');
@@ -372,31 +337,28 @@
                 btn.textContent = 'Enviando...';
 
                 try {
-                    if (typeof emailjs === 'undefined') {
-                        throw new Error('EmailJS não carregou');
-                    }
+                    console.log('📧 Enviando via Netlify Function...');
 
-                    console.log('📧 Enviando com EmailJS...');
-
-                    const resp = await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-                        name: n,
-                        from_name: n,
-                        from_email: 'contato@portfolio.com',
-                        email: 'contato@portfolio.com',
-                        title: a,
-                        subject: a,
-                        message: m
+                    const res = await fetch('/.netlify/functions/send-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: n,
+                            assunto: a,
+                            mensagem: m
+                        })
                     });
 
-                    console.log('✅ Resposta:', resp);
+                    const data = await res.json();
+                    console.log('✅ Resposta:', data);
 
-                    if (resp.status === 200) {
+                    if (res.ok) {
                         alert('✅ Mensagem enviada com sucesso!\n\nObrigado pelo contato!');
                         nome.value = '';
                         assunto.value = '';
                         msg.value = '';
                     } else {
-                        throw new Error('Falha no envio');
+                        throw new Error(data.error || 'Erro desconhecido');
                     }
                 } catch (erro) {
                     console.error('❌ Erro:', erro);
