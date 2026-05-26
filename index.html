@@ -282,6 +282,17 @@
 
     </main>
 
+    <!-- EmailJS (hospedado localmente para evitar bloqueio de CDN) -->
+    <script src="emailjs.min.js"></script>
+    <script>
+        try {
+            emailjs.init('qIt2GEhCJGQ4Nl8rF');
+            console.log('✅ EmailJS inicializado');
+        } catch(e) {
+            console.error('⚠️ EmailJS não disponível', e);
+        }
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Página iniciada');
@@ -315,7 +326,7 @@
             document.querySelectorAll('.bloco, .cards, .cardsProva').forEach(el => obs.observe(el));
             console.log('✅ Animações ativas');
 
-            // Formulário - Netlify Function
+            // Formulário - EmailJS
             const btn = document.getElementById('botaoEnviar');
             const nome = document.getElementById('nome');
             const assunto = document.getElementById('assunto');
@@ -337,29 +348,27 @@
                 btn.textContent = 'Enviando...';
 
                 try {
-                    console.log('📧 Enviando via Netlify Function...');
+                    if (typeof emailjs === 'undefined') {
+                        throw new Error('EmailJS não carregou');
+                    }
 
-                    const res = await fetch('/.netlify/functions/send-email', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            nome: n,
-                            assunto: a,
-                            mensagem: m
-                        })
+                    console.log('📧 Enviando com EmailJS...');
+
+                    await emailjs.send('service_phvrtak', 'template_fnvxmsx', {
+                        name: n,
+                        from_name: n,
+                        from_email: 'contato@portfolio.com',
+                        email: 'contato@portfolio.com',
+                        title: a,
+                        subject: a,
+                        message: m
                     });
 
-                    const data = await res.json();
-                    console.log('✅ Resposta:', data);
-
-                    if (res.ok) {
-                        alert('✅ Mensagem enviada com sucesso!\n\nObrigado pelo contato!');
-                        nome.value = '';
-                        assunto.value = '';
-                        msg.value = '';
-                    } else {
-                        throw new Error(data.error || 'Erro desconhecido');
-                    }
+                    alert('✅ Mensagem enviada com sucesso!\n\nObrigado pelo contato!');
+                    nome.value = '';
+                    assunto.value = '';
+                    msg.value = '';
+                    console.log('✅ Email enviado com sucesso');
                 } catch (erro) {
                     console.error('❌ Erro:', erro);
                     alert('❌ Erro: ' + erro.message);
