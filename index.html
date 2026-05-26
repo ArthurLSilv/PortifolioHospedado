@@ -282,48 +282,12 @@
 
     </main>
 
-    <!-- EmailJS - Múltiplas CDNs como fallback -->
+    <!-- Script removido - usando Netlify Function -->
     <script>
-        // Tentar carregar EmailJS de múltiplas fontes
-        function loadEmailJS() {
-            const scripts = [
-                'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/build/email.min.js',
-                'https://cdnjs.cloudflare.com/ajax/libs/emailjs-com/3.2.0/email.min.js',
-                'https://unpkg.com/@emailjs/browser@3/dist/build/email.min.js'
-            ];
-
-            let scriptElement = document.createElement('script');
-            scriptElement.src = scripts[0];
-            scriptElement.onerror = function() {
-                console.warn('CDN 1 falhou, tentando CDN 2...');
-                scriptElement.src = scripts[1];
-                scriptElement.onerror = function() {
-                    console.warn('CDN 2 falhou, tentando CDN 3...');
-                    scriptElement.src = scripts[2];
-                    scriptElement.onerror = function() {
-                        console.error('Todas as CDNs falharam!');
-                    };
-                    document.head.appendChild(scriptElement);
-                };
-                document.head.appendChild(scriptElement);
-            };
-            document.head.appendChild(scriptElement);
-        }
-        loadEmailJS();
+        console.log('✅ Usando Netlify Function para envio de email');
     </script>
 
     <script>
-        const EMAILJS_KEY = 'qIt2GEhCJGQ4Nl8rF';
-        const EMAILJS_SERVICE = 'service_phvrtak';
-        const EMAILJS_TEMPLATE = 'template_fnvxmsx';
-
-        setTimeout(() => {
-            if (typeof emailjs !== 'undefined') {
-                emailjs.init(EMAILJS_KEY);
-                console.log('✅ EmailJS inicializado');
-            }
-        }, 500);
-
         document.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Página iniciada');
 
@@ -356,7 +320,7 @@
             document.querySelectorAll('.bloco, .cards, .cardsProva').forEach(el => obs.observe(el));
             console.log('✅ Animações ativas');
 
-            // Formulário
+            // Formulário - Usando Netlify Function
             const btn = document.getElementById('botaoEnviar');
             const nome = document.getElementById('nome');
             const assunto = document.getElementById('assunto');
@@ -378,44 +342,32 @@
                 btn.textContent = 'Enviando...';
 
                 try {
-                    // Tentar EmailJS primeiro
-                    if (typeof emailjs !== 'undefined') {
-                        console.log('📧 Tentando EmailJS...');
-                        await emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-                            name: n,
-                            from_name: n,
-                            from_email: 'contato@portfolio.com',
-                            subject: a,
-                            message: m
-                        });
-                        alert('✅ Mensagem enviada com sucesso!');
+                    console.log('📧 Enviando via Netlify Function...');
+
+                    const res = await fetch('/.netlify/functions/send-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: n,
+                            assunto: a,
+                            mensagem: m
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        alert('✅ Mensagem enviada com sucesso!\n\nObrigado pelo contato!');
+                        nome.value = '';
+                        assunto.value = '';
+                        msg.value = '';
+                        console.log('✅ Email enviado');
                     } else {
-                        // Fallback: Usar Formspree
-                        console.log('📧 EmailJS não disponível, usando Formspree...');
-                        const res = await fetch('https://formspree.io/f/xyzpqklj', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                name: n,
-                                email: 'contato@portfolio.com',
-                                subject: a,
-                                message: m
-                            })
-                        });
-
-                        if (res.ok) {
-                            alert('✅ Mensagem enviada com sucesso!');
-                        } else {
-                            throw new Error('Formspree falhou');
-                        }
+                        throw new Error(data.error || 'Erro desconhecido');
                     }
-
-                    nome.value = '';
-                    assunto.value = '';
-                    msg.value = '';
                 } catch (erro) {
-                    console.error('Erro:', erro);
-                    alert('⚠️ Erro ao enviar.\n\nEnvie manualmente para:\nengs-arthursilva@camporeal.edu.br\n\nAssunto: ' + a + '\nMensagem: ' + m);
+                    console.error('❌ Erro:', erro);
+                    alert('❌ Erro ao enviar: ' + erro.message);
                 } finally {
                     btn.disabled = false;
                     btn.textContent = 'Enviar Mensagem';
